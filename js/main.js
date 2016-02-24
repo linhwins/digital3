@@ -60,7 +60,7 @@ window.onload = function() {
         
         //spawn random treats every half second -> 500 milliseconds
         spawner = game.time.create(false);
-        spawner.loop(Phaser.Timer.SECOND * 0.5, spawnTreats, this);
+        spawner.loop(Phaser.Timer.SECOND * 0.5, spawnBalls, this);
         spawner.start();
         
         //  Finally some treats to eat
@@ -123,7 +123,7 @@ window.onload = function() {
     
     
     //randomly spawns treats on a timer
-    function spawnTreats() {
+    function spawnBalls() {
         var ball = balls.create((Math.random() * 700)+50, 0, 'ball'); //spawns a treat at a random location
         
         //format for the treat (its settings)
@@ -164,5 +164,9 @@ window.onload = function() {
         //add text to tell the player the game ended
         var text = game.add.text(350, 32, "Game Over", {fontSize: '32px', fill: '##9999ff'});
 
+    }
+    
+    function render() {
+        game.debug.text("Time Remaining: " + (timer.duration.toFixed(0) / Phaser.Timer.SECOND), 16, 72);
     }
 };
