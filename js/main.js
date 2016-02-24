@@ -16,37 +16,153 @@ window.onload = function() {
     var game = new Phaser.Game( 800, 600, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
     
     function preload() {
-        // Load an image and call it 'logo'.
-        game.load.image( 'logo', 'assets/phaser.png' );
+      game.load.image('starfield', 'assets/starfield.jpg');
+      game.load.image('ball', 'assets/pangball.png');
+      game.load.image('coin', 'assets/pandacoin.png');
     }
     
-    var bouncy;
+    var tilesprite;
+    var cursors; 
+    var balls; 
+    
+    var score = 0;
+    var score_text; 
+    var gameOver; 
+    
+    var timer;
+    var spawner; 
     
     function create() {
-        // Create a sprite at the center of the screen using the 'logo' image.
-        bouncy = game.add.sprite( game.world.centerX, game.world.centerY, 'logo' );
-        // Anchor the sprite at its center, as opposed to its top-left corner.
-        // so it will be truly centered.
-        bouncy.anchor.setTo( 0.5, 0.5 );
+        game.physics.startSystem(Phaser.Physics.ARCADE);
+
+        game.physics.arcade.gravity.y = 60;
+
+        //ball = game.add.sprite(400, 0, 'ball');
+        tilesprite = game.add.tileSprite(300, 450, 200, 100, 'starfield');
+
+        //game.physics.enable([ ball, tilesprite ], Phaser.Physics.ARCADE);
+        game.physics.arcade.enable(tilesprite);
+
+        //ball.body.collideWorldBounds = true;
+       // ball.body.bounce.set(1);
+
+        tilesprite.body.collideWorldBounds = true;
+        tilesprite.body.immovable = true;
+        tilesprite.body.allowGravity = false;
+
+        cursors = game.input.keyboard.createCursorKeys();
         
-        // Turn on the arcade physics engine for this sprite.
-        game.physics.enable( bouncy, Phaser.Physics.ARCADE );
-        // Make it bounce off of the world bounds.
-        bouncy.body.collideWorldBounds = true;
+        //introduce the notion of a time limit.
+        timer = game.time.create(false);
+        //30 second timer
+        timer.loop(Phaser.Timer.SECOND * 30, stopGame, this); //will kill timer once stopGame is called
+        timer.start();
+        
+        //spawn random treats every half second -> 500 milliseconds
+        spawner = game.time.create(false);
+        spawner.loop(Phaser.Timer.SECOND * 0.5, spawnTreats, this);
+        spawner.start();
+        
+        //  Finally some treats to eat
+        balls = game.add.group();
+
+        //  We will enable physics for any treat that is created in this group
+        balls.enableBody = true;
+
+        
+        //  The score
+        score_text = game.add.text(16, 16, 
+            'Score: ' + score, { fontSize: '32px', fill: '#9999ff' });
+        
         
         // Add some text using a CSS style.
         // Center it in X, and position its top 15 pixels from the top of the world.
         var style = { font: "25px Verdana", fill: "#9999ff", align: "center" };
-        var text = game.add.text( game.world.centerX, 15, "Build something awesome.", style );
+        var text = game.add.text( game.world.centerX, 10, "Collect the strawberries only!", style );
         text.anchor.setTo( 0.5, 0.0 );
+        
+        
+        
     }
     
+    
+    function collectBall (tilesprite, ball) {
+
+        // Removes the star from the screen
+        ball.kill();
+        
+        score = score + 10;
+        score_text.text = "Score: " + score;
+        }
+    
     function update() {
-        // Accelerate the 'logo' sprite towards the cursor,
-        // accelerating at 500 pixels/second and moving no faster than 500 pixels/second
-        // in X or Y.
-        // This function returns the rotation angle that makes it visually match its
-        // new trajectory.
-        bouncy.rotation = game.physics.arcade.accelerateToPointer( bouncy, this.game.input.activePointer, 500, 500, 500 );
+          //game.physics.arcade.collide(balls, tilesprite);
+          game.physics.arcade.overlap(tilesprite, balls, collectBall, null, this);
+          game.physics.arcade.collide(balls, balls);
+
+        if (cursors.left.isDown)
+        {
+          tilesprite.body.x -= 8;
+          tilesprite.tilePosition.x -= 8;
+        }
+        else if (cursors.right.isDown)
+        {
+          tilesprite.body.x += 8;
+          tilesprite.tilePosition.x += 8;
+        }
+
+        if (cursors.up.isDown)
+        {
+          tilesprite.tilePosition.y += 8;
+        }
+        else if (cursors.down.isDown)
+        {
+          tilesprite.tilePosition.y -= 8;
+        }
+       }
+    
+    
+    //randomly spawns treats on a timer
+    function spawnTreats() {
+        var ball = balls.create((Math.random() * 700)+50, 0, 'ball'); //spawns a treat at a random location
+        
+        //format for the treat (its settings)
+        //scale down the treats
+        ball.scale.x -= 0.8;
+        ball.scale.y -= 0.8;
+
+        //  Let gravity do its thing
+        ball.body.gravity.y = 250;
+        //found a bug where treats that hit the ground didn't actually hit the ground and fell through
+        ball.body.collideWorldBounds = true;
+
+        //  This just gives each treat a slightly random bounce value
+        ball.body.bounce.y = 0.7 + Math.random() * 0.3;
+        
+        //now give random x velocity
+        var num = Math.random(); //if the random number generated is less than 0.5, then we move right
+        var modifier = 0;
+        if (num < 0.5)
+            modifier = 1; //moves to the right direction
+        else
+            modifier = -1; //moves to the left direction
+        
+        ball.body.velocity.x = (Math.random() * 200 * modifier) + (100 * modifier); //random number between 100 <-> 300 || -300 <-> -100
+    }
+    
+    
+    //terminates the game
+    function stopGame() {
+        //stop the timer
+        timer.stop();
+        //reset game input
+        game.input.reset();
+        
+        game.input.keyboard.enabled = false; //stop keyboard usage
+        
+        
+        //add text to tell the player the game ended
+        var text = game.add.text(350, 32, "Game Over", {fontSize: '32px', fill: '##9999ff'});
+
     }
 };
