@@ -17,13 +17,17 @@ window.onload = function() {
     
     function preload() {
       game.load.image('starfield', 'assets/starfield.jpg');
-      game.load.image('ball', 'assets/pangball.png');
-      game.load.image('coin', 'assets/pandacoin.png');
+      game.load.image('ball', 'assets/banana1.jpg'); //sub for bananas
+      game.load.image('coin', 'assets/coin.png'); //sub for flying monkey
+      game.load.image( 'bambooscreen', 'assets/bcg1.jpg' ); //load background 
     }
     
     var tilesprite;
     var cursors; 
     var balls; 
+    var coin; 
+    var coins;
+    var bkgr; 
     
     var score = 0;
     var score_text; 
@@ -36,6 +40,8 @@ window.onload = function() {
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
         game.physics.arcade.gravity.y = 60;
+        
+        bkgr = game.add.tileSprite(0, 0, 2000, 2000, 'bambooscreen'); 
 
         //ball = game.add.sprite(400, 0, 'ball');
         tilesprite = game.add.tileSprite(300, 450, 200, 100, 'starfield');
@@ -69,6 +75,30 @@ window.onload = function() {
         //  We will enable physics for any treat that is created in this group
         balls.enableBody = true;
 
+        /*coins=game.add.group();
+        coins.enableBody=true;
+        for (i = 0; i < 2; i++)
+        {
+        //  Create a star inside of the 'stars' group
+        var coin = coins.create(i * 150, 1, 'coin');
+        coin.body.velocity.setTo(200,200);
+        //coin.body.collideWorldBounds=true;
+        coin.body.bounce.y = 0.7 + Math.random() * 0.2;
+        coin.body.bounce.x=  0.7 + Math.random() * 0.2;
+        }*/
+        
+        coin = game.add.sprite(400, 200, 'coin');
+        game.physics.enable(coin, Phaser.Physics.ARCADE);
+        coin.body.velocity.setTo(200, 200);
+    
+    //  This makes the game world bounce-able
+    coin.body.collideWorldBounds = true;
+    
+    //  This sets the image bounce energy for the horizontal  and vertical vectors (as an x,y point). "1" is 100% energy return
+    coin.body.bounce.set(1);
+
+    coin.body.gravity.set(0, 180);
+        
         
         //  The score
         score_text = game.add.text(16, 16, 
@@ -78,7 +108,7 @@ window.onload = function() {
         // Add some text using a CSS style.
         // Center it in X, and position its top 15 pixels from the top of the world.
         var style = { font: "25px Verdana", fill: "#9999ff", align: "center" };
-        var text = game.add.text( game.world.centerX, 10, "Collect the strawberries only!", style );
+        var text = game.add.text( game.world.centerX, 10, "Catch all the bananas! Avoid the monkey!", style );
         text.anchor.setTo( 0.5, 0.0 );
         
         
@@ -95,10 +125,19 @@ window.onload = function() {
         score_text.text = "Score: " + score;
         }
     
+        function enemyHitsPlayer (tilesprite,coins) {
+        stateText.text=" You were eaten! GAME OVER \n Click to restart";
+        stateText.visible = true;
+            var text = game.add.text(350, 32, "Game Over", {fontSize: '32px', fill: '##9999ff'});
+        game.input.onTap.addOnce(restart,this);
+    }
+    
     function update() {
           //game.physics.arcade.collide(balls, tilesprite);
           game.physics.arcade.overlap(tilesprite, balls, collectBall, null, this);
-          game.physics.arcade.collide(balls, balls);
+          game.physics.arcade.overlap(tilesprite, coin, enemyHitsPlayer, null, this);
+          //game.physics.arcade.collide(tilesprite, coin);
+          //game.physics.arcade.overlap(tilesprite,coin,explode,null,this);
 
         if (cursors.left.isDown)
         {
@@ -168,5 +207,6 @@ window.onload = function() {
     
     function render() {
         game.debug.text("Time Remaining: " + (timer.duration.toFixed(0) / Phaser.Timer.SECOND), 16, 72);
+        game.debug.spriteInfo(coin, 32, 32);
     }
 };
