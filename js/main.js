@@ -17,10 +17,11 @@ window.onload = function() {
     
     function preload() {
       game.load.image('starfield', 'assets/brown.jpg');
-        //game.load.image('starfield', 'assets/basket.png');
+    //game.load.image('starfield', 'assets/log.png');
       game.load.image('ball', 'assets/banana.png'); //sub for bananas
       game.load.image('coin', 'assets/insect.png'); //sub for flying monkey
       game.load.image( 'bambooscreen', 'assets/bcg1.jpg' ); //load background 
+      game.load.audio('track','assets/track3.mp3');
     }
     
     var tilesprite;
@@ -29,6 +30,7 @@ window.onload = function() {
     var coin; 
     var coins;
     var bkgr; 
+    var music;
     
     var score = 0;
     var score_text; 
@@ -39,6 +41,7 @@ window.onload = function() {
     
     
     function create() {
+        music = game.sound.play('track'); //added music here
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
         game.physics.arcade.gravity.y = 60;
