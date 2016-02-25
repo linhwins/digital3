@@ -16,9 +16,10 @@ window.onload = function() {
     var game = new Phaser.Game( 800, 600, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
     
     function preload() {
-      game.load.image('starfield', 'assets/starfield.jpg');
-      game.load.image('ball', 'assets/banana1.jpg'); //sub for bananas
-      game.load.image('coin', 'assets/coin.png'); //sub for flying monkey
+      game.load.image('starfield', 'assets/brown.jpg');
+        //game.load.image('starfield', 'assets/basket.png');
+      game.load.image('ball', 'assets/banana.png'); //sub for bananas
+      game.load.image('coin', 'assets/insect.png'); //sub for flying monkey
       game.load.image( 'bambooscreen', 'assets/bcg1.jpg' ); //load background 
     }
     
@@ -36,6 +37,7 @@ window.onload = function() {
     var timer;
     var spawner; 
     
+    
     function create() {
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -44,7 +46,9 @@ window.onload = function() {
         bkgr = game.add.tileSprite(0, 0, 2000, 2000, 'bambooscreen'); 
 
         //ball = game.add.sprite(400, 0, 'ball');
-        tilesprite = game.add.tileSprite(300, 450, 200, 100, 'starfield');
+        //tilesprite = game.add.tileSprite(300, 450, 200, 100, 'starfield');
+        tilesprite = game.add.tileSprite(298,500, 120, 40, 'starfield');
+         //tilesprite = game.add.tileSprite(300,500, 120, 140, 'starfield');
 
         //game.physics.enable([ ball, tilesprite ], Phaser.Physics.ARCADE);
         game.physics.arcade.enable(tilesprite);
@@ -88,6 +92,7 @@ window.onload = function() {
         }*/
         
         coin = game.add.sprite(400, 200, 'coin');
+        //coin = game.add.sprite(400, 300, 'coin');
         game.physics.enable(coin, Phaser.Physics.ARCADE);
         coin.body.velocity.setTo(200, 200);
     
@@ -108,7 +113,7 @@ window.onload = function() {
         // Add some text using a CSS style.
         // Center it in X, and position its top 15 pixels from the top of the world.
         var style = { font: "25px Verdana", fill: "#9999ff", align: "center" };
-        var text = game.add.text( game.world.centerX, 10, "Catch all the bananas! Avoid the monkey!", style );
+        var text = game.add.text( game.world.centerX, 50, "Catch as much bananas as possible! Avoid the fly!", style );
         text.anchor.setTo( 0.5, 0.0 );
         
         
